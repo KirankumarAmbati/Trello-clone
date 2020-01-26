@@ -1,6 +1,8 @@
 let i = 0;
 
-export let lists = [{ "id": "0", "title": "A", "cards": [{ "id": "card-1580062087109", "cardTitle": "1", "cardDescription": "" }, { "id": "card-1580062092015", "cardTitle": "3", "cardDescription": "" }] }, { "id": "1", "title": "B", "cards": [{ "id": "card-1580062096265", "cardTitle": "4", "cardDescription": "" }, { "id": "card-1580062103574", "cardTitle": "5", "cardDescription": "" }] }];
+// export let lists = [{ "id": "0", "title": "A", "cards": [{ "id": "card-1580062087109", "cardTitle": "1", "cardDescription": "" }, { "id": "card-1580062092015", "cardTitle": "3", "cardDescription": "" }] }, { "id": "1", "title": "B", "cards": [{ "id": "card-1580062096265", "cardTitle": "4", "cardDescription": "" }, { "id": "card-1580062103574", "cardTitle": "5", "cardDescription": "" }] }];
+
+export let lists = []
 
 export function addListToBoardApi(title) {
 

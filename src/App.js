@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
+import '@atlaskit/css-reset'
 
 import './App.css';
 import Modal from './Modal';
@@ -24,7 +25,10 @@ class App extends React.Component {
     addCard: false,
     addList: false,
     cardTitle: '',
-    cardDescription: ''
+    cardDescription: '',
+    listTitle: '',
+    addListError: false,
+    addCardError: false
   };
 
   showModal = (cardTitle, cardDescription) => {
@@ -56,89 +60,145 @@ class App extends React.Component {
 
   onDragEnd = result => {
     const { source, destination, type } = result;
-    let {lists} = this.props;
+    let { lists } = this.props;
 
-    // let newLists = Array.from(lists)
-
-    console.log('Result: ', result, lists);
-    if(!destination) {
-      return
-    }
-    
-    if(
-      destination.droppableId === source.droppableId
-      && destination.index === source.index
-    ) {
+    if (!destination) {
       return
     }
 
+    if (destination.droppableId === source.droppableId && destination.index === source.index) {
+      return
+    }
 
-
-    if(type === 'list') {
+    if (type === 'list') {
       let resElement = lists.splice(result.source.index, 1);
-      
+
       lists.splice(result.destination.index, 0, resElement[0]);
 
     } else {
-  
       let resElement = lists[result.source.droppableId].cards.splice(result.source.index, 1);
-      
+
       lists[result.destination.droppableId].cards.splice(result.destination.index, 0, resElement[0]);
     }
-
-    console.log('Reslt: ', lists);
-    
-
   }
 
   render() {
+    let { show, cardTitle, cardDescription, addCard, listId, addList, listTitle, addListError, addCardError } = this.state;
     const { lists, asyncAddCardToList, asyncAddListToBoard } = this.props;
 
     return (
       <div className="App">
-        
         <div className="App-header">
-          <Brand>Trello</Brand>
+          <Brand>Crello</Brand>
           <DragDropContext onDragEnd={this.onDragEnd}>
             <Droppable droppableId="all-columns" direction="horizontal" type="list">
-            {(provided) => (
-              <Container
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-              {
-                lists && lists.map((list, index) => (
-                  <List key={list.id} list={list} listIndex={index} showModal={this.showModal}  handleAddCard={this.handleAddCard} />
-                ))
-              }
-              <button style={{ backgroundColor: '#EC5E0C', color: 'white', border: '0', height: '66px', cursor: 'pointer', width: '10%', marginTop: '0.6%' }} onClick={() => this.setState({ addList: true })}>Add List</button>
-              {provided.placeholder}
-              </Container>
-            )}
+              {(provided) => (
+                <Container
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  {
+                    lists && lists.map((list, index) => (
+                      <List key={list.id} list={list} listIndex={index} showModal={this.showModal} handleAddCard={this.handleAddCard} />
+                    ))
+                  }
+                  {provided.placeholder}
+                  <button
+                    style={{
+                      backgroundColor: '#EC5E0C',
+                      color: 'white',
+                      border: '0',
+                      height: '66px',
+                      cursor: 'pointer',
+                      width: '10%'
+                    }}
+                    onClick={() => this.setState({ addList: true })}
+                  >
+                    Add List
+                  </button>
+                </Container>
+              )}
             </Droppable>
           </DragDropContext>
 
-
-          <Modal show={this.state.show} handleClose={this.hideModal}>
-            <h3 style={{ color: 'red' }}>{this.state.cardTitle}</h3>
-            <p style={{ color: 'black' }}>{this.state.cardDescription}</p>
+          <Modal show={show} handleClose={this.hideModal}>
+            <h3 style={{ color: 'red' }}>{cardTitle}</h3>
+            <p style={{ color: 'black' }}>{cardDescription}</p>
           </Modal>
-          <Modal show={this.state.addCard} handleClose={this.hideModal}>
-            <input type="text" onChange={(e) => this.setState({ cardTitle: e.target.value })} value={this.state.cardTitle} placeholder="Title" />
-            <input type="text" onChange={(e) => this.setState({ cardDescription: e.target.value })} value={this.state.cardDescription} placeholder="Description" />
-            <button onClick={() => {
-              asyncAddCardToList(this.state.listId, this.state.cardTitle, this.state.cardDescription);
-              this.setState({ listId: '', cardTitle: '', cardDescription: '' })
-              this.hideModal();
-            }}>Add Card</button>
+          <Modal show={addCard} handleClose={this.hideModal}>
+            <input
+              type="text"
+              placeholder="Title"
+              value={cardTitle}
+              onChange={(e) => this.setState({ cardTitle: e.target.value })}
+              style={{
+                border: '2px solid #EC5E0C',
+                padding: '10px'
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              value={cardDescription}
+              onChange={(e) => this.setState({ cardDescription: e.target.value })}
+              style={{
+                border: '2px solid #EC5E0C',
+                padding: '10px',
+                marginLeft: '5px'
+              }}
+            />
+            <button
+              onClick={() => {
+                if (cardTitle === '') {
+                  this.setState({ addCardError: true });
+                } else {
+                  this.setState({ addCardError: false, listId: '', cardTitle: '', cardDescription: '' });
+                  asyncAddCardToList(listId, cardTitle, cardDescription);
+                  this.hideModal();
+                }
+              }}
+              style={{
+                marginLeft: '5px',
+                padding: '10px',
+                border: '2px solid #EC5E0C',
+                backgroundColor: '#EC5E0C',
+                color: 'white'
+              }}
+            >
+              Add Card
+            </button>
+            {addCardError && <p style={{ color: 'red' }}>* Please enter title to proceed</p>}
           </Modal>
-          <Modal show={this.state.addList} handleClose={this.hideModal}>
-            <input type="text" value={this.state.listTitle} onChange={(e) => this.setState({ listTitle: e.target.value })} placeholder="Title" />
-            <button onClick={() => {
-              asyncAddListToBoard(this.state.listTitle);
-              this.setState({ listTitle: '' })
-              this.hideModal();
-            }}>Add List</button>
+          <Modal show={addList} handleClose={this.hideModal}>
+            <input
+              type="text"
+              style={{ border: '2px solid #EC5E0C', padding: '10px' }}
+              value={listTitle}
+              onChange={(e) => this.setState({ listTitle: e.target.value })}
+              placeholder="Title"
+            />
+            <button
+              onClick={() => {
+                if (listTitle === '') {
+                  this.setState({ addListError: true });
+                }
+                else {
+                  this.setState({ addListError: false, listTitle: '' });
+                  asyncAddListToBoard(listTitle);
+                  this.hideModal();
+                }
+              }}
+              style={{
+                marginLeft: '5px',
+                padding: '10px',
+                border: '2px solid #EC5E0C',
+                backgroundColor: '#EC5E0C',
+                color: 'white'
+              }}
+            >
+              Add List
+            </button>
+            {addListError && <p style={{ color: 'red' }}>* Please enter title to proceed</p>}
           </Modal>
         </div>
       </div>

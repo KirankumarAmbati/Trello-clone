@@ -1,8 +1,7 @@
-import React from 'react';
-import Card from './Card';
+import React from 'react'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-
 import styled from 'styled-components'
+import Card from './Card'
 
 const Container = styled.div`
     background-color: ${props => props.isDraggingOver ? 'lightblue' : 'white'};
@@ -13,7 +12,7 @@ const OutsideContainer = styled.div`
     background-color: white;
     min-width: 200px;
     color: black;
-    margin: 10px;
+    margin-right: 1px;
 `;
 
 const Title = styled.div`
@@ -29,7 +28,7 @@ const List = ({ list, listIndex, showModal, handleAddCard }) => {
             {(provided) => (
                 <OutsideContainer {...provided.draggableProps} ref={provided.innerRef}>
                     <Title {...provided.dragHandleProps}>{list.title}</Title>
-                    <Droppable droppableId={list.id} type="card">
+                    <Droppable droppableId={(listIndex).toString()} type="card">
                         {(provided, snapshot) => (
                             <Container
                                 {...provided.droppableProps}
@@ -41,11 +40,25 @@ const List = ({ list, listIndex, showModal, handleAddCard }) => {
                                         <Card card={card} key={card.id} showModal={showModal} index={index} />
                                     ))
                                 }
-                                <button style={{ cursor: 'pointer', position: 'relative', width: '100%', border: '2px solid black', padding: '10px 20px', marginTop: '20px', minWidth: '100px' }} onClick={() => handleAddCard(listIndex)}>Add Card</button>
                                 {provided.placeholder}
                             </Container>
                         )}
                     </Droppable>
+                        <button
+                            style={{
+                                cursor: 'pointer',
+                                position: 'relative',
+                                width: '90%',
+                                marginBottom: '10px',
+                                border: '2px solid black',
+                                padding: '10px 20px',
+                                marginTop: '20px',
+                                minWidth: '100px'
+                            }}
+                            onClick={() => handleAddCard(listIndex)}
+                        >
+                            Add Card
+                        </button>
                 </OutsideContainer>
             )}
         </Draggable>

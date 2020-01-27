@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@atlaskit/css-reset": "^5.0.9",
     "eslint": "^6.8.0",
     "react": "^16.11.0",
     "react-beautiful-dnd": "^12.2.0",

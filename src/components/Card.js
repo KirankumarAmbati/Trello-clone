@@ -5,16 +5,15 @@ import { Draggable } from 'react-beautiful-dnd';
 const Container = styled.div`
   border: 1px solid lightgrey;
   border-radius: 2px;
-  padding: 5px;
-  margin-bottom: 15px;
-  min-height: 60px;
+  padding: 20px;
+  margin-bottom: 5px;
   background-color: ${props => (props.isDragging ? 'lightgreen' : 'white')};
 
 `;
 
 export default class Card extends React.Component {
     render() {
-        const {card, showModal, index} = this.props;
+        const { card, showModal, index } = this.props;
 
         return (
             <Draggable draggableId={card.id} index={index}>
